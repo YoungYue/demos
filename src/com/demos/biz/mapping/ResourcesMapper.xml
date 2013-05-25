@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.demos.biz.mapper.ResourcesMapper">
+	<resultMap id="BaseResultMap" type="com.demos.biz.domain.Resources">
+		<id column="resId" property="resId" jdbcType="INTEGER" />
+		<result column="resName" property="resName" jdbcType="VARCHAR" />
+		<result column="resUrl" property="resUrl" jdbcType="VARCHAR" />
+		<result column="resDes" property="resDes" jdbcType="VARCHAR" />
+		<result column="resState" property="resState" jdbcType="VARCHAR" />
+	</resultMap>
+
+	<select id="getList" resultMap="BaseResultMap" parameterType="map">
+		SELECT * FROM tbl_resources LIMIT #{start}, #{rows};
+	</select>
+
+	<select id="getTotal" resultType="int">
+		select count(*) from tbl_resources;
+	</select>
+
+	<select id="addResources" parameterType="com.demos.biz.domain.Resources">
+		INSERT INTO tbl_resources(resName, resUrl, resDes, resState)
+		VALUES(#{resName}, #{resUrl}, #{resDes}, #{resState});
+	</select>
+
+	<select id="updateResources" parameterType="com.demos.biz.domain.Resources">
+		UPDATE tbl_resources
+		SET resName = #{resName}, resUrl = #{resUrl}, resDes = #{resDes}, resState = #{resState}
+		WHERE resId = #{resId};
+	</select>
+
+	<select id="deleteResources" parameterType="Integer">
+		DELETE FROM tbl_resources WHERE resId IN
+		<foreach collection="array" index="index" item="item" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</select>
+</mapper>

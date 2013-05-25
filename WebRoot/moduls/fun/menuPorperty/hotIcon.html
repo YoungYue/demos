@@ -1,0 +1,151 @@
+<script type="text/javascript">
+var hotIcon = {};
+$(function() {
+	$('#moduls_fun_menuPorperty_hotIcon_datagrid').datagrid({
+		url : 'fileController/getHotIcon.do',
+		fit : true,
+		border : false,
+		checkOnSelect : false,
+		selectOnCheck : false,
+		idField : 'iconId',
+		columns : [ [ {
+			title : '编号',
+			field : 'iconId',
+			width : 150,
+			checkbox : true
+		}, {
+			title : '图标',
+			field : 'icon',
+			width : 150,
+			formatter : function(value, row, index) {
+				var iconUrl = 'resources/userFiles/'
+								+ north_crrUser.userId
+								+ '/hotIcon/'
+								+ row.iconId;
+				return '<img height="50" width="50" src="'+iconUrl+'" />';
+			}
+		}, {
+			field : 'action',
+			title : '动作',
+			width : 100,
+			formatter : function(value, row, index) {
+				if (row.id == '0') {
+					return '系统角色';
+				} else {
+					return formatString('<img onclick="hotIcon.updateIcon(\'{0}\');" src="{1}"/>&nbsp;&nbsp;&nbsp;<img onclick="hotIcon.deleteIcon(\'{2}\');" src="{3}"/>', row.iconId, 'jslib/jquery-easyui-1.3.1/themes/icons/pencil.png', row.iconId, 'jslib/jquery-easyui-1.3.1/themes/icons/cancel.png', row.userId);
+				}
+			}
+		} ] ],
+		toolbar : [ {
+			text : '增加',
+			iconCls : 'icon-add',
+			handler : function() {
+				moduls_fun_menuPorperty_oldFileName = '';
+				hotIcon.upLoadIcon();
+			}
+		}, '-', {
+			text : '批量删除',
+			iconCls : 'icon-remove',
+			handler : function() {
+				hotIcon.removeIcon();
+			}
+		}, '-', {
+			text : '刷新',
+			iconCls : 'icon-reload',
+			handler : function() {
+				$('#moduls_fun_menuPorperty_hotIcon_datagrid').datagrid('reload');
+			}
+		} ]
+	});
+	
+	hotIcon.upLoadIcon = function() {
+		$('<div/>').dialog({
+			href : 'moduls/fun/menuPorperty/uploadFile.html',
+			width : 430,
+			height : 370,
+			closable : false,
+			title : '上传文件',
+			modal : true,
+			buttons : [ {
+				text : '取消',
+				iconCls : 'icon-remove',
+				handler : function() {
+					$(this).closest('.window-body').dialog('destroy');
+				}
+			} ],
+			onLoad : function() {
+				hotIcon.addIconDialog = $(this).closest('.window-body');
+			}
+		});
+	};
+	
+	hotIcon.updateIcon = function(iconName) {
+		moduls_fun_menuPorperty_oldFileName = iconName;
+		hotIcon.upLoadIcon();
+	};
+	
+	hotIcon.deleteIcon = function(iconName) {
+		$('#moduls_fun_menuPorperty_hotIcon_datagrid').datagrid('uncheckAll').datagrid('unselectAll').datagrid('clearSelections');
+		var index = $('#moduls_fun_menuPorperty_hotIcon_datagrid').datagrid('getRowIndex', iconName);
+		$('#moduls_fun_menuPorperty_hotIcon_datagrid').datagrid('checkRow', index);
+		hotIcon.removeIcon();
+	};
+	
+	hotIcon.removeIcon = function() {
+		var rows = $('#moduls_fun_menuPorperty_hotIcon_datagrid').datagrid('getChecked');
+		var ids = [];
+		if (rows.length > 0) {
+			$.messager.confirm('确认', '您是否要删除当前选中的项目？', function(r) {
+				if (r) {
+					for ( var i = 0; i < rows.length; i++) {
+						ids.push(rows[i].iconId);
+					}
+					$.ajax({
+						url : 'fileController/deleteHotIcon.do',
+						data : {
+							iconNames : ids.join(',')
+						},
+						dataType : 'json',
+						type: 'POST',
+						success : function(result) {
+							var info = '删除失败！';
+							if (result.success) {
+								info = '删除成功！';
+								$('#moduls_fun_menuPorperty_hotIcon_datagrid').datagrid('load');
+								$('#moduls_fun_menuPorperty_hotIcon_datagrid').datagrid('uncheckAll').datagrid('unselectAll').datagrid('clearSelections');
+							}
+							$.messager.show({
+								title : '提示',
+								msg : info
+							});
+						}
+					});
+				}
+			});
+		} else {
+			$.messager.show({
+				title : '提示',
+				msg : '请勾选要删除的记录！'
+			});
+		}
+	};
+	
+	hotIcon.addIcon = function(result) {
+		if (!result.success) {
+			$.messager.show({
+				msg : result.info,
+				title : '提示'
+			});
+			return;
+		}
+		
+		hotIcon.addIconDialog.dialog('destroy');
+		$('#moduls_fun_menuPorperty_hotIcon_datagrid').datagrid('reload');
+	};
+	
+	yy.upFile.callback = hotIcon.addIcon;
+	yy.upFile.saveFileName = "hotIcon";
+
+});
+</script>
+<table id="moduls_fun_menuPorperty_hotIcon_datagrid"></table>

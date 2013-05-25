@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.demos.biz.mapper.RoleMapper">
+	<resultMap id="BaseResultMap" type="com.demos.biz.domain.Role">
+		<id column="roleId" property="roleId" jdbcType="INTEGER" />
+		<result column="roleName" property="roleName" jdbcType="VARCHAR" />
+		<result column="roleCode" property="roleCode" jdbcType="VARCHAR" />
+	</resultMap>
+
+	<select id="getList" resultMap="BaseResultMap" parameterType="map">
+		SELECT * FROM tbl_role
+		<if test="rows!=0">LIMIT #{start}, #{rows}</if>
+	</select>
+
+	<select id="getTotal" resultType="int">
+		select count(*) from tbl_role;
+	</select>
+
+	<select id="addRole" parameterType="com.demos.biz.domain.Role">
+		INSERT INTO tbl_role(roleName, roleCode) VALUES(#{roleName}, #{roleCode});
+	</select>
+
+	<select id="updateRole" parameterType="com.demos.biz.domain.Role">
+		UPDATE tbl_role SET roleName = #{roleName}, roleCode = #{roleCode} WHERE roleId = #{roleId};
+	</select>
+	<select id="deleteRole" parameterType="Integer">
+		DELETE FROM tbl_role WHERE roleId IN
+		<foreach collection="array" index="index" item="item" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</select>
+	
+	<select id="findRoleByRoleName" resultType="com.demos.biz.domain.Role" parameterType="String">
+		select * from tbl_role where roleName = #{roleName};
+	</select>
+	
+</mapper>

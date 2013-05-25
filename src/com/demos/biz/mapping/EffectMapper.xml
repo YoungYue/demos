@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.demos.biz.mapper.EffectMapper">
+	<resultMap id="BaseResultMap" type="com.demos.biz.domain.Effect">
+		<result column="eid" property="eid" jdbcType="INTEGER" />
+		<result column="menuType" property="menuType" jdbcType="INTEGER" />
+		<result column="eName" property="eName" jdbcType="VARCHAR" />
+		<result column="eDescription" property="eDescription" jdbcType="VARCHAR" />
+	</resultMap>
+
+	<select id="getList" resultMap="BaseResultMap" parameterType="map">
+		SELECT * FROM tbl_effect 
+		<if test="menuType!=-1">WHERE menuType = #{menuType}</if>
+		<if test="rows!=0">LIMIT #{start}, #{rows}</if>
+	</select>
+	
+	<select id="getTotal" resultType="int">
+		select count(*) from tbl_effect;
+	</select>
+
+	<insert id="addEffect" parameterType="com.demos.biz.domain.Effect">
+		INSERT INTO tbl_effect(menuType, eName, eDescription) VALUES(#{menuType}, #{eName}, #{eDescription});
+	</insert>
+
+	<update id="updateEffect" parameterType="com.demos.biz.domain.Effect">
+		UPDATE tbl_effect
+		SET menuType = #{menuType}, eName = #{eName}, eDescription = #{eDescription}
+		WHERE eid = #{eid};
+	</update>
+	<delete id="deleteEffect" parameterType="Integer">
+		DELETE FROM tbl_effect WHERE eid IN
+		<foreach collection="array" index="index" item="item" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</delete>
+
+</mapper>

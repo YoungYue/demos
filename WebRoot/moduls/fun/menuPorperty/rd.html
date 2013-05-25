@@ -1,0 +1,89 @@
+<script type="text/javascript">
+	var moduls_fun_menuPorperty_inputName;
+	var moduls_fun_menuPorperty_oldFileName;
+	var moduls_fun_menuPorperty_dialog;
+	var moduls_fun_menuPorperty_hotPoint_dialog;
+
+	$(function() {
+		moduls_menu_checkParentEffect('moduls_fun_menuPorperty_Form');
+		
+		moduls_menu_addClickOnUpFileInput('inputType');
+		
+		moduls_menu_addClickOnSetPlaceInput('inputType2');
+		
+		$.ajax({
+			url : 'menuController/getMenuPro.do',
+			data : {
+				menuId : moduls_menu_menuId
+			},
+			cache : false,
+			dataType : 'JSON',
+			success : function(r) {
+				$(r).each(function(i, value) {
+					if(value.proKey == 'isZw') {
+						if(value.proValue == 1) {
+							$("#moduls_fun_menuPorperty_Form input[name='isZw']").attr('checked','checked');
+						}
+					}else {
+						$("#moduls_fun_menuPorperty_Form input[name='" + value.proKey + "']").val(value.proValue);
+					}
+				});
+			}
+		});
+		
+		yy.upFile.callback = setFileName;
+		yy.upFile.saveFileName = "menuFiles";
+	});
+	
+	function setHotPointValue(point,iconName) {
+		$("#moduls_fun_menuPorperty_Form input[name='"+moduls_fun_menuPorperty_hotPointValueInputName+"']").val(point);
+		$("#moduls_fun_menuPorperty_Form input[name='"+moduls_fun_menuPorperty_hotPointIconInputName+"']").val(iconName);
+	}
+
+	function setFileName(result) {
+		if (!result.success) {
+			$.messager.show({
+				msg : result.info,
+				title : '提示'
+			});
+			return;
+		}
+		$("#moduls_fun_menuPorperty_Form input[name='" + moduls_fun_menuPorperty_inputName + "']").val(result.obj);
+		moduls_fun_menuPorperty_dialog.dialog('destroy');
+	}
+
+	function moduls_fun_menuPro_getFormValue() {
+		var obj = {};
+		var value = $("#moduls_fun_menuPorperty_Form").serialize();
+		decodeURIComponent(value,true);
+		encodeURI(encodeURI(value));
+
+		obj.falg = true;
+		obj.value = value;
+		return obj;
+	}
+</script>
+<div align="center">
+	<br />
+	<form id="moduls_fun_menuPorperty_Form" method="post">
+		<table class="tableForm">
+			<!-- <tr>
+				<th style="width: 60px;font-size: 12px; font-weight: normal;">热点位置:</th>
+				<td><input name="hotPoint" inputType2="1" class="easyui-validatebox inputCss" style="width: 180px;" readonly="readonly" data-options="required:true" /></td>
+			</tr> -->
+			<tr>
+				<th style="width: 60px;font-size: 12px; font-weight: normal;">菜单图片:</th>
+				<td><input name="nodeMenuPicture" inputType="1" class="easyui-validatebox inputCss" style="width: 180px;" readonly="readonly" data-options="required:true" />
+				</td>
+			</tr>
+			<tr>
+				<th style="width: 60px;font-size: 12px; font-weight: normal;">背景图片:</th>
+				<td><input name="nodeBackgroundPicture" inputType="1" class="easyui-validatebox inputCss" style="width: 180px;" readonly="readonly" data-options="required:true" /></td>
+			</tr>
+			<tr>
+				<th style="width: 60px;font-size: 12px; font-weight: normal;">背景音乐:</th>
+				<td><input name="nodeMusicFile" inputType="1" class="easyui-validatebox inputCss" style="width: 180px;" readonly="readonly" data-options="required:true" /></td>
+			</tr>
+		</table>
+	</form>
+</div>

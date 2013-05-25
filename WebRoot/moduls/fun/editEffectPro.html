@@ -1,0 +1,25 @@
+<script type="text/javascript">
+
+</script>
+<div align="center">
+<br/>
+	<form id="moduls_fun_editEffectPro_editForm" method="post">
+		<input type="hidden" name="epId" />
+		<table class="tableForm">
+			<tr>
+				<th style="width: 60px;font-size: 12px; font-weight: normal;">显示效果</th>
+				<td><input id="eid" name="effect.eid" class="easyui-combobox inputCss" style="width: 152px;" data-options="valueField:'eid',textField:'eName',required:true,url:'effectController/getEffect.do'" /></td>
+			</tr>
+			<tr>
+				<th style="width: 80px;font-size: 12px; font-weight: normal;">属性名称</th>
+				<td><input name="epKey" class="easyui-validatebox" data-options="required:true" />
+				</td>
+			</tr>
+			<tr>
+				<th style="width: 80px;font-size: 12px; font-weight: normal;">属性注释</th>
+				<td><input name="epNote" class="easyui-validatebox" data-options="required:false" />
+				</td>
+			</tr>
+		</table>
+	</form>
+</div>

@@ -1,0 +1,96 @@
+<script type="text/javascript">
+	$(function() {
+		moduls_menu_checkParentEffect('moduls_fun_menuPorperty_Form');
+		
+		moduls_menu_addClickOnUpFileInput('inputType');
+		
+		moduls_menu_addClickOnSetPlaceInput('inputType2');
+		
+		setTimeout(function() {
+			moduls_menu_admin_menu_proFun_dialog.dialog({
+				height : 270,
+			});
+		}, 300);
+		$.ajax({
+			url : 'menuController/getMenuPro.do',
+			data : {
+				menuId : moduls_menu_menuId
+			},
+			cache : false,
+			dataType : 'JSON',
+			success : function(r) {
+				$(r).each(function(i, value) {
+					if(value.proKey == 'isZw') {
+						if(value.proValue == 1) {
+							$("#moduls_fun_menuPorperty_Form input[name='isZw']").attr('checked','checked');
+						}
+					}else {
+						$("#moduls_fun_menuPorperty_Form input[name='" + value.proKey + "']").val(value.proValue);
+					}
+				});
+			}
+		});
+		
+		yy.upFile.callback = setFileName;
+		yy.upFile.saveFileName = "menuFiles";
+	});
+
+	function setFileName(result) {
+		if (!result.success) {
+			$.messager.show({
+				msg : '文件上传失败！',
+				title : '提示'
+			});
+			return;
+		}
+		$("#moduls_fun_menuPorperty_Form input[name='" + moduls_fun_menuPorperty_inputName + "']").val(result.obj);
+		moduls_fun_menuPorperty_dialog.dialog('destroy');
+	}
+
+	function moduls_fun_menuPro_getFormValue() {
+		var obj = {};
+		var value = $("#moduls_fun_menuPorperty_Form").serialize();
+		decodeURIComponent(value,true);
+		encodeURI(encodeURI(value));
+
+		obj.falg = true;
+		obj.value = value;
+		return obj;
+	}
+	
+	function setHotPointValue(point,iconName) {
+		$("#moduls_fun_menuPorperty_Form input[name='"+moduls_fun_menuPorperty_hotPointValueInputName+"']").val(point);
+		$("#moduls_fun_menuPorperty_Form input[name='"+moduls_fun_menuPorperty_hotPointIconInputName+"']").val(iconName);
+	}
+</script>
+<div align="center">
+	<br />
+	<form id="moduls_fun_menuPorperty_Form" method="post">
+		<table class="tableForm">
+			<tr>
+				<th style="width: 100px;font-size: 12px; font-weight: normal;">菜单图片(正常):</th>
+				<td><input name="nodeMenuPicture" inputType="1" class="easyui-validatebox inputCss" style="width: 180px;" readonly="readonly" data-options="required:true" /></td>
+			</tr>
+			<tr>
+				<th style="width: 100px;font-size: 12px; font-weight: normal;">菜单图片(按下):</th>
+				<td><input name="nodeImageFileDown" inputType="1" class="easyui-validatebox inputCss" style="width: 180px;" readonly="readonly" data-options="required:true" /></td>
+			</tr>
+			<tr>
+				<th style="width: 100px;font-size: 12px; font-weight: normal;">菜单图片(选中):</th>
+				<td><input name="nodeImageFileCheck" inputType="1" class="easyui-validatebox inputCss" style="width: 180px;" readonly="readonly" data-options="required:true" /></td>
+			</tr>
+			<tr>
+				<th style="width: 100px;font-size: 12px; font-weight: normal;">背景图片:</th>
+				<td><input name="nodeImageFileBg" inputType="1" class="easyui-validatebox inputCss" style="width: 180px;" readonly="readonly" data-options="required:true" /></td>
+			</tr>
+			<tr>
+				<th style="width: 100px;font-size: 12px; font-weight: normal;">菜单选中音效:</th>
+				<td><input name="nodeMusicFileCheck" inputType="1" class="easyui-validatebox inputCss" style="width: 180px;" readonly="readonly" data-options="required:true" /></td>
+			</tr>
+			<tr>
+				<th style="width: 100px;font-size: 12px; font-weight: normal;">菜单背景音乐:</th>
+				<td><input name="nodeMusicFilebj" inputType="1" class="easyui-validatebox inputCss" style="width: 180px;" readonly="readonly" data-options="required:true" /></td>
+			</tr>
+		</table>
+	</form>
+</div>

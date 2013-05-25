@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.demos.biz.mapper.EffectPropertyMapper">
+	<resultMap id="BaseResultMap" type="com.demos.biz.domain.EffectProperty">
+		<id column="epId" property="epId" jdbcType="INTEGER" />
+		<result column="menuId" property="menuId" jdbcType="INTEGER" />
+		<result column="epKey" property="epKey" jdbcType="VARCHAR" />
+		<result column="epValue" property="epValue" jdbcType="VARCHAR" />
+		<result column="epNote" property="epNote" jdbcType="VARCHAR" />
+		<association property="effect" javaType="com.demos.biz.domain.Effect">
+			<result column="eid" property="eid" jdbcType="INTEGER" />
+			<result column="eName" property="eName" jdbcType="VARCHAR" />
+		</association>
+	</resultMap>
+
+	<select id="getList" resultMap="BaseResultMap" parameterType="map">
+		SELECT a.*, b.eName 
+		FROM tbl_effectProperty a, tbl_effect b
+		WHERE a.eId = b.eid
+		<if test="eid!=-1">
+		AND b.eid = #{eid}
+		</if>
+	</select>
+
+	<insert id="addEffectProperty" parameterType="com.demos.biz.domain.EffectProperty">
+		INSERT INTO tbl_effectProperty(eid, epKey, epValue, epNote) 
+		VALUES(#{effect.eid}, #{epKey}, #{epValue}, #{epNote});
+	</insert>
+
+	<update id="updateEffectProperty" parameterType="com.demos.biz.domain.EffectProperty">
+		UPDATE tbl_effectProperty 
+		SET eid = #{effect.eid}, epKey = #{epKey}, epValue = #{epValue}, epNote = #{epNote} 
+		WHERE epId = #{epId};
+	</update>
+	<delete id="deleteEffectProperty" parameterType="java.util.Arrays">
+		DELETE FROM tbl_effectProperty WHERE epId IN
+		<foreach collection="array" index="index" item="item" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</delete>
+
+</mapper>

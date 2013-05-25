@@ -1,0 +1,199 @@
+<script type="text/javascript">
+var contentMenu = {};
+var menu_row = $('#admin_menu_treegrid').treegrid('getSelected');
+var imgUrl = 'resources/userFiles/'
+	 + north_crrUser.userId
+	 + "/resourcesFiles/";
+
+$(function() {
+	$('#moduls_menu_contentMenu_datagrid').datagrid({
+		url : 'fileController/getList.do?menuId=' + menu_row.id,
+		fit : true,
+		border : false,
+		pagination : true,
+		rownumbers : true,
+		checkOnSelect : false,
+		selectOnCheck : false,
+		singleSelect : true,
+		idField : 'fid',
+		nowrap : false,
+		columns : [ [ {
+			title : '编号',
+			field : 'fid',
+			width : 150,
+			checkbox : true
+		}, {
+			title : '文件',
+			field : 'fileName',
+			width : 150,
+			styler: function(value,row,index){
+				//return 'background-color: #0000CC';
+				return '';
+			},
+			formatter : function(value, row, index) {
+				if(value != null) {
+					return '<img src="' +imgUrl + value +'" width="190" height="100" onLoad="moduls_menu_contentMenu_imgOnLoad(this)"></img>';
+				} else {
+					return '';
+				}
+			}
+		}, {
+			field : 'action',
+			title : '动作',
+			width : 100,
+			formatter : function(value, row, index) {
+				if (row.id == '0') {
+					return '系统角色';
+				} else {
+					return formatString('<img onclick="moduls_menu_contentMenu_editFun(\'{0}\');" src="{1}"/>&nbsp;&nbsp;&nbsp;' + '<img onclick="moduls_menu_contentMenu_previewImg(\'{2}\');" src="{3}"/> &nbsp;&nbsp;&nbsp;' + '<img onclick="moduls_role_deleteFun(\'{4}\');" src="{5}"/>', row.fid, 'jslib/jquery-easyui-1.3.1/themes/icons/pencil.png', row.fid, 'jslib/jquery-easyui-1.3.1/themes/icons/search.png', row.fid, 'jslib/jquery-easyui-1.3.1/themes/icons/cancel.png');
+				}
+			}
+		} ] ],
+		toolbar : [ {
+			text : '增加',
+			iconCls : 'icon-add',
+			handler : function() {
+				moduls_menu_contentMenu_addFun();
+			}
+		}, '-', {
+			text : '批量删除',
+			iconCls : 'icon-remove',
+			handler : function() {
+				moduls_role_removeFun();
+			}
+		}, '-', {
+			text : '刷新',
+			iconCls : 'icon-reload',
+			handler : function() {
+				$('#moduls_menu_contentMenu_datagrid').datagrid('reload');
+			}
+		} ]
+	});
+});
+
+function moduls_menu_contentMenu_imgOnLoad(img) {
+	console.info(img.src);
+	var theImage = new Image();
+	theImage.src = $(img).attr("src");
+	var nowImageWidth = Math.round(theImage.width/(theImage.height/100));
+	$(img).attr({
+		width : nowImageWidth,
+		heigth : 100
+	});
+}
+
+function moduls_menu_contentMenu_previewImg(id) {
+	$('#moduls_menu_contentMenu_datagrid').datagrid('uncheckAll').datagrid('unselectAll').datagrid('clearSelections');
+	var index = $('#moduls_menu_contentMenu_datagrid').datagrid('getRowIndex', id);
+	$('#moduls_menu_contentMenu_datagrid').datagrid('checkRow', index);
+	var rows = $('#moduls_menu_contentMenu_datagrid').datagrid('getChecked');
+	
+	window.open(imgUrl + rows[0].fileName);
+}
+
+function moduls_menu_contentMenu_editFun(id) {
+	$('#moduls_menu_contentMenu_datagrid').datagrid('uncheckAll').datagrid('unselectAll').datagrid('clearSelections');
+	var index = $('#moduls_menu_contentMenu_datagrid').datagrid('getRowIndex', id);
+	$('#moduls_menu_contentMenu_datagrid').datagrid('checkRow', index);
+	var rows = $('#moduls_menu_contentMenu_datagrid').datagrid('getChecked');
+	
+	yy.upFile.url = '../fileController/updateFile.do';
+	
+	var row = $('#moduls_menu_contentMenu_datagrid').datagrid('getSelected');
+	yy.upFile.parameter = 'menuId=' + menu_row.id + '&fileId=' + id+ '&oldFile=' + rows[0].fileName;
+	yy.upFile.callback = addFileCallback;
+	
+	openUpFileDialog();
+}
+
+function moduls_menu_contentMenu_addFun() {
+	yy.upFile.url = '../fileController/addFile.do';
+	yy.upFile.parameter = 'menuId=' + menu_row.id;
+	yy.upFile.callback = addFileCallback;
+	
+	openUpFileDialog();
+}
+
+var openUpFileDialog = function() {
+	$('<div/>').dialog({
+		href : 'moduls/fun/menuPorperty/uploadFile.html',
+		width : 430,
+		height : 370,
+		closable : false,
+		title : '上传文件',
+		modal : true,
+		buttons : [ {
+			text : '取消',
+			iconCls : 'icon-remove',
+			handler : function() {
+				$(this).closest('.window-body').dialog('destroy');
+			}
+		} ],
+		onLoad : function() {
+			contentMenu.upFileDialog = $(this).closest('.window-body');
+		}
+	});
+};
+
+var addFileCallback = function(result) {
+	var info = '上传成功！';
+	if (!result.success) {
+		info = result.info;
+		$.messager.show({msg : info, title : '提示'});
+		return;
+	}
+	$.messager.show({msg : info, title : '提示'});
+	
+	contentMenu.upFileDialog.dialog('destroy');
+	$('#moduls_menu_contentMenu_datagrid').datagrid('reload');
+	
+};
+
+function moduls_role_removeFun() {
+	var rows = $('#moduls_menu_contentMenu_datagrid').datagrid('getChecked');
+	var files = [];
+	if (rows.length > 0) {
+		$.messager.confirm('确认', '您是否要删除当前选中的项目？', function(r) {
+			if (r) {
+				for ( var i = 0; i < rows.length; i++) {
+					var file = {};
+					file.fid = rows[i].fid;
+					file.fileName = rows[i].fileName;
+					files.push(file);
+				}
+				$.ajax({
+					url : 'fileController/deleteFile.do',
+					data : {
+						files : $.toJSON(files)
+					},
+					dataType : 'json',
+					success : function(result) {
+						var info = '删除失败！';
+						if (result.success) {
+							info = '删除成功！';
+							$('#moduls_menu_contentMenu_datagrid').datagrid('load');
+							$('#moduls_menu_contentMenu_datagrid').datagrid('uncheckAll').datagrid('unselectAll').datagrid('clearSelections');
+						}
+						$.messager.show({
+							title : '提示',
+							msg : info
+						});
+					}
+				});
+			}
+		});
+	} else {
+		$.messager.show({
+			title : '提示',
+			msg : '请勾选要删除的记录！'
+		});
+	}
+}
+function moduls_role_deleteFun(id) {
+	$('#moduls_menu_contentMenu_datagrid').datagrid('uncheckAll').datagrid('unselectAll').datagrid('clearSelections');
+	var index = $('#moduls_menu_contentMenu_datagrid').datagrid('getRowIndex', id);
+	$('#moduls_menu_contentMenu_datagrid').datagrid('checkRow', index);
+	moduls_role_removeFun();
+}
+</script>
+<table id="moduls_menu_contentMenu_datagrid"></table>

@@ -1,0 +1,61 @@
+<script type="text/javascript">
+var moduls_fun_sysParam_dialog;
+var moduls_fun_menuPorperty_oldFileName;
+$(function() {
+	$("#moduls_fun_editSysParam_Form input[name='paraFile']").click(function() {
+		moduls_fun_menuPorperty_oldFileName = this.value;
+		$('<div/>').dialog({
+			href : 'moduls/fun/menuPorperty/uploadFile.html',
+			width : 430,
+			height : 370,
+			closable : false,
+			title : '上传文件',
+			modal : true,
+			buttons : [ {
+				text : '取消',
+				iconCls : 'icon-remove',
+				handler : function() {
+					$(this).closest('.window-body').dialog('destroy');
+				}
+			} ],
+			onLoad : function() {
+				moduls_fun_sysParam_dialog = $(this).closest('.window-body');
+			}
+		});
+	});
+	
+	yy.upFile.callback = setFileName;
+	yy.upFile.saveFileName = "sysParamFiles";
+});
+
+function setFileName(result) {
+	console.info(result);
+	if (!result.success) {
+		$.messager.show({
+			msg : result.info,
+			title : '提示'
+		});
+		return;
+	}
+	$("#moduls_fun_editSysParam_Form input[name='paraFile']").val(result.obj);
+	moduls_fun_sysParam_dialog.dialog('destroy');
+}
+</script>
+<div align="center">
+	<br />
+	<form id="moduls_fun_editSysParam_Form" method="post">
+		<input type="hidden" name="sid" />
+		<table class="tableForm">
+			<tr>
+				<th style="width: 60px;font-size: 12px; font-weight: normal;">参数名称</th>
+				<td><input name="paraName" class="easyui-validatebox" disabled="disabled" />
+				</td>
+			</tr>
+			<tr>
+				<th style="width: 80px;font-size: 12px; font-weight: normal;">参数文件</th>
+				<td><input name="paraFile" class="easyui-validatebox" data-options="required:false" />
+				</td>
+			</tr>
+		</table>
+	</form>
+</div>

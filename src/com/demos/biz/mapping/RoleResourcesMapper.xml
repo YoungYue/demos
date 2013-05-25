@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.demos.biz.mapper.RoleResourcesMapper">
+	<resultMap id="BaseResultMap" type="com.demos.biz.domain.RoleResources">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="roleId" property="roleId" jdbcType="INTEGER" />
+		<association property="resources" javaType="com.demos.biz.domain.Resources">
+			<id column="resId" property="resId" jdbcType="INTEGER" />
+			<result column="resName" property="resName" jdbcType="VARCHAR" />
+			<result column="resUrl" property="resUrl" jdbcType="VARCHAR" />
+			<result column="resDes" property="resDes" jdbcType="VARCHAR" />
+			<result column="resState" property="resState" jdbcType="VARCHAR" />
+		</association>
+	</resultMap>
+
+	<select id="distributeResources" parameterType="map">
+		INSERT INTO tbl_role_resources(roleId, resId) VALUES
+		<foreach collection="list" index="index" item="item" open="" separator="," close="">
+            (#{item.roleId}, #{item.resources.resId})
+        </foreach>
+	</select>
+
+	<select id="isDistributeResources" resultMap="BaseResultMap" parameterType="map">
+		SELECT * FROM tbl_role_resources WHERE roleId = #{roleId} AND resId = #{resId}
+	</select>
+
+	<select id="delDistributeResources" parameterType="Integer">
+		DELETE FROM tbl_role_resources WHERE id IN
+		<foreach collection="array" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+	</select>
+
+	<select id="getRoleResByRoleId" resultMap="BaseResultMap" parameterType="Integer">
+		SELECT * FROM tbl_role a, tbl_role_resources b, tbl_resources c
+		WHERE a.roleId = b.roleId
+		AND b.resId = c.resId
+		AND a.roleId = #{roleId};
+	</select>
+</mapper>

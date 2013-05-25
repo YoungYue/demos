@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.demos.biz.mapper.FilesMapper" >
+  <resultMap id="BaseResultMap" type="com.demos.biz.domain.Files" >
+    <id column="fid" property="fid" jdbcType="INTEGER" />
+    <result column="menuId" property="menuId" jdbcType="INTEGER" />
+    <result column="fileName" property="fileName" jdbcType="VARCHAR" />
+    <result column="fileSize" property="fileSize" jdbcType="VARCHAR" />
+    <result column="fileSort" property="fileSort" jdbcType="VARCHAR" />
+    <result column="fileRealName" property="fileRealName" jdbcType="VARCHAR" />
+    <result column="fileType" property="fileType" jdbcType="VARCHAR" />
+  </resultMap>
+  
+  <select id="getList" resultMap="BaseResultMap" parameterType="Integer">
+		SELECT * FROM tbl_files
+		WHERE menuId = #{menuId}
+	</select>
+
+	<select id="addFile" parameterType="com.demos.biz.domain.Files">
+		INSERT INTO tbl_files(menuId, fileName, fileSize, fileRealName, fileType) 
+		VALUES(#{menuId}, #{fileName}, #{fileSize}, #{fileRealName}, #{fileType});
+	</select>
+
+	<select id="updateFile" parameterType="com.demos.biz.domain.Files">
+		UPDATE tbl_files 
+		SET fileName = #{fileName}, fileSize = #{fileSize}
+			, fileRealName = #{fileRealName}, fileType = #{fileType} 
+		WHERE fid = #{fid};
+	</select>
+	<select id="deleteFile" parameterType="Integer">
+		DELETE FROM tbl_files WHERE fid IN
+		<foreach collection="array" index="index" item="item" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</select>
+</mapper>

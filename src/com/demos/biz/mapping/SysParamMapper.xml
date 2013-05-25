@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.demos.biz.mapper.SysParamMapper">
+	<resultMap id="BaseResultMap" type="com.demos.biz.domain.SysParam">
+		<id column="sid" property="sid" jdbcType="INTEGER" />
+		<result column="paraName" property="paraName" jdbcType="VARCHAR" />
+		<result column="paraFile" property="paraFile" jdbcType="VARCHAR" />
+		<result column="thumbnail" property="thumbnail" jdbcType="VARCHAR" />
+	</resultMap>
+
+	<select id="getList" resultMap="BaseResultMap" parameterType="int">
+		SELECT * FROM tbl_sysparam
+		<!-- <if test="falg!=0">WHERE falg = #{falg}</if> -->
+	</select>
+
+	<select id="update" parameterType="com.demos.biz.domain.SysParam">
+		UPDATE tbl_sysparam 
+		SET paraFile = #{paraFile}, thumbnail = #{thumbnail} 
+		WHERE sid = #{sid};
+	</select>
+</mapper>

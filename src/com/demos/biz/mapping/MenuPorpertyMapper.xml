@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.demos.biz.mapper.MenuPorpertyMapper">
+	<resultMap id="BaseResultMap" type="com.demos.biz.domain.MenuPorperty">
+		<id column="mpId" property="mpId" jdbcType="INTEGER" />
+		<result column="menuId" property="menuId" jdbcType="INTEGER" />
+		<result column="proKey" property="proKey" jdbcType="VARCHAR" />
+		<result column="proValue" property="proValue" jdbcType="VARCHAR" />
+	</resultMap>
+
+	<select id="updateMenuPro" parameterType="com.demos.biz.domain.MenuPorperty">
+		INSERT INTO tbl_menuporperty(menuId, proKey, proValue) 
+		VALUES(#{menuId}, #{proKey}, #{proValue});
+	</select>
+	<select id="getMenuPro" resultMap="BaseResultMap" parameterType="Integer">
+		SELECT * FROM tbl_menuporperty WHERE menuId = #{menuId}
+	</select>
+	<delete id="deleteMenuPro" parameterType="Integer">
+		DELETE FROM tbl_menuporperty WHERE menuId = #{menuId}
+	</delete>
+</mapper>

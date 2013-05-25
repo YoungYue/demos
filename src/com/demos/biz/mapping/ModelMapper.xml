@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.demos.biz.mapper.ModelMapper">
+	<resultMap id="BaseResultMap" type="com.demos.biz.domain.Model">
+		<id column="modId" property="modId" jdbcType="INTEGER" />
+		<result column="modName" property="modName" jdbcType="VARCHAR" />
+		<result column="modDes" property="modDes" jdbcType="VARCHAR" />
+		<result column="parMod" property="parMod" jdbcType="INTEGER" />
+		<result column="modCode" property="modCode" jdbcType="INTEGER" />
+		<result column="modUrl" property="modUrl" jdbcType="VARCHAR" />
+	</resultMap>
+
+	<select id="getList" resultMap="BaseResultMap">
+		select * from tbl_model
+	</select>
+
+	<select id="addModel" parameterType="com.demos.biz.domain.Model">
+		INSERT INTO tbl_model(modName, modDes, parMod, modCode, modUrl)
+			VALUES(#{modName}, #{modDes}, #{parMod}, #{modCode}, #{modUrl});
+	</select>
+
+	<select id="updateModel" parameterType="com.demos.biz.domain.Role">
+		UPDATE tbl_model 
+		SET modName = #{modName}, modDes = #{modDes}, 
+			parMod = #{parMod}, modCode = #{modCode}, modUrl = #{modUrl} 
+		WHERE modId = #{modId};
+	</select>
+
+	<select id="deleteModel" parameterType="Integer">
+		DELETE FROM tbl_model WHERE modId IN
+		<foreach collection="array" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+	</select>
+</mapper>

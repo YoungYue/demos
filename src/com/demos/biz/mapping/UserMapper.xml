@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.demos.biz.mapper.UserMapper">
+
+	<resultMap id="BaseResultMap" type="com.demos.biz.domain.User">
+		<id column="userId" property="userId" jdbcType="INTEGER" />
+		<result column="username" property="username" jdbcType="VARCHAR" />
+		<result column="realName" property="realName" jdbcType="VARCHAR" />
+		<result column="password" property="password" jdbcType="VARCHAR" />
+		<result column="state" property="state" jdbcType="INTEGER" />
+		<result column="valiCode" property="valiCode" jdbcType="VARCHAR" />
+		<association property="role" javaType="com.demos.biz.domain.Role">
+			<id column="roleId" property="roleId" />
+			<result column="roleName" property="roleName" jdbcType="VARCHAR" />
+			<result column="roleCode" property="roleCode" jdbcType="VARCHAR" />
+		</association>
+	</resultMap>
+	
+	<select id="findUserByUsername" resultMap="BaseResultMap" parameterType="String">
+		SELECT * FROM tbl_user a, tbl_role b
+		WHERE a.roleId = b.roleId
+		AND username = #{username};
+	</select>
+
+	<select id="getList" resultMap="BaseResultMap" parameterType="map">
+		SELECT a.userId, a.username, a.realName, a.state, a.valiCode, b.roleName, b.roleId
+		FROM tbl_user a, tbl_role b 
+		WHERE a.roleId = b.roleId LIMIT #{start}, #{rows};
+	</select>
+
+	<select id="getTotal" resultType="int">
+		select count(*) from tbl_user;
+	</select>
+	
+	<select id="addUser" parameterType="com.demos.biz.domain.User">
+		INSERT INTO 
+		tbl_user(username, realName, password, state, valiCode, roleId)
+		VALUES(#{username}, #{realName}, #{password}, #{state}, #{valiCode}, #{role.roleId});
+	</select>
+	
+	<select id="updateUser" parameterType="com.demos.biz.domain.User">
+		UPDATE tbl_user 
+		SET realName = #{realName}, state = #{state}, 
+			valiCode = #{valiCode}, roleId = #{role.roleId}
+		WHERE userId = #{userId};
+	</select>
+	
+	<select id="deleteUser" parameterType="java.util.Arrays">
+		DELETE FROM tbl_user WHERE userId IN
+		<foreach collection="array" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+	</select>
+	
+</mapper>

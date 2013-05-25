@@ -1,0 +1,193 @@
+<script type="text/javascript">
+	var hotPoint_divImg_left;
+	var hotPoint_divImg_top;
+	var hotPoint_icon;
+	$(function() {
+		hotPoint_divImg_left = -1;
+		hotPoint_divImg_top = -1;
+		setTimeout(function() {
+			moduls_fun_menuPorperty_hotPoint_dialog.dialog({
+				buttons : [ {
+					text : '图标管理',
+					iconCls : 'icon-add',
+					handler : function() {
+						managerHotIcon();
+					}
+				}, {
+					text : '完成',
+					iconCls : 'icon-remove',
+					handler : function() {
+						if(hotPoint_divImg_left != -1 && hotPoint_divImg_top != -1) {
+							setHotPointValue("{"+hotPoint_divImg_left+","+hotPoint_divImg_top+"}", hotPoint_icon.replace(/_/g, '.'));
+						}
+						$(this).closest('.window-body').dialog('destroy');
+					}
+				}, {
+					text : '取消',
+					iconCls : 'icon-remove',
+					handler : function() {
+						$(this).closest('.window-body').dialog('destroy');
+					}
+				} ]
+			});
+		}, 300);
+		
+		initHotIcon();
+		
+		$('#hotPoint_target').droppable({   
+		    accept:'.iconCss',
+		    onDrop : function(e,source){ 
+		    	 hotPoint_icon = source.id.replace('.', '_');
+                 var c = $(source).clone();
+                 c.attr({style : "position: absolute;left:"+hotPoint_divImg_left+"px;top:"+hotPoint_divImg_top+"px;"});
+                 $(this).empty().append(c);  
+                 c.draggable({  
+                     revert:true,
+                     onDrag : iconOnDrag
+                 });  
+		    }
+		}); 
+		$("img[id='hotPoint_BackgroundImg']").attr('src'
+													,'resources/userFiles/'
+													+ north_crrUser.userId
+													+ '/menuFiles/'
+													+moduls_fun_menuPorperty_parentBackgroundImg);
+	});
+	
+	function initHotIcon() {
+		$.ajax({
+			url : 'fileController/getHotIcon.do',
+			dataType : 'JSON',
+			success : function(r) {
+				$("#hotIcon table tr td div[name='falg']").parent().remove();
+				$(r).each(function(i,value) {
+					var str = '<td><div id="'+value.iconId.replace('.', '_')+'" name="falg" class="iconCss">'
+							  + '<img height="50" width="50" src="resources/userFiles/'
+							  + north_crrUser.userId
+							  + '/hotIcon/' + value.iconId
+							  + '" /></div></td>';
+							  
+					$('#hotIcon table tr').append(str);
+				});
+				
+				$('#hotIcon table tr td div').draggable({
+					proxy : 'clone',
+					revert : true,
+					onDrag : iconOnDrag
+				});
+				
+				hotPoint_setHotPointValue();
+			}
+		});
+	}
+	
+	var iconOnDrag = function(e) {
+		var d = e.data;
+		if($(e.data.parent).is('td') && d.top < 60) {
+			return;
+		} else if(!($(e.data.parent).is('td')) && d.top <= -30) {
+			return;
+		}
+		
+		hotPoint_divImg_left = d.left;
+		hotPoint_divImg_top = d.top;
+		if($(e.data.parent).is('td')) {
+			hotPoint_divImg_top = hotPoint_divImg_top - 60;
+		}
+	};
+	
+	//热点图标管理
+	var managerHotIcon = function() {
+		$('<div/>').dialog({
+			href : 'moduls/fun/menuPorperty/hotIcon.html',
+			width : 650,
+			height : 500,
+			closable : false,
+			modal : true,
+			title : '热点图标管理',
+			buttons : [ {
+				text : '退出',
+				iconCls : 'icon-remove',
+				handler : function() {
+					$(this).closest('.window-body').dialog('destroy');
+					initHotIcon();
+				}
+			} ]
+		});
+	};
+	
+	function hotPoint_setHotPointValue() {
+		var hotPointValue = $("input[name='"+moduls_fun_menuPorperty_hotPointValueInputName+"']").val();
+		var hotPointIcon = $("input[name='"+moduls_fun_menuPorperty_hotPointIconInputName+"']").val();
+		
+		if(!hotPointIcon || hotPointIcon.length == 0) {
+			return;
+		}
+		
+		var hotPointIconId = hotPointIcon.replace('.', '_');
+		var falg = false;
+		if($("#hotIcon table tr td div[id='"+hotPointIconId+"']").length == 0) {
+			hotPointIconId = 'systemIconHotPoint1_png';
+			falg = true;
+		}
+		if(!hotPointValue) {
+			hotPointValue = '{50,50}';
+		}
+		hotPointValue = hotPointValue.replace(/{/g, '').replace(/}/g, '');
+		hotPointValue = hotPointValue.split(',');
+		var icon = $('#' + hotPointIconId).clone();
+		if(falg) {
+			$($(icon).find('img')[0]).attr('src'
+					,'resources/userFiles/'
+					+ north_crrUser.userId
+					+ '/menuFiles/'
+					+hotPointIcon);
+			var src = $($(icon).find('img')).attr('src');
+		}
+		icon.attr({style : "position: absolute;left:"+hotPointValue[0]+"px;top:"+hotPointValue[1]+"px;"});
+		$('#hotPoint_target').empty().append(icon); 
+		icon.draggable({
+			revert : true,
+			onDrag : iconOnDrag
+		});
+	}
+</script>
+<style type="text/css">
+.iconCss{
+	z-index: 800;
+	width: 50px;
+	height: 50px;
+}
+</style>
+<div>
+	<div id="hotIcon" style="height:60px; background-color:#999999;">
+		<table style="border: 0px;">
+			<tr>
+				<td>
+					<div id="systemIconHotPoint1_png" class="iconCss">
+						<img height="50" width="50" src="resources/img/systemIconHotPoint1.png" />
+					</div>
+				</td>
+				<td>
+					<div id="systemIconHotPoint2_png" class="iconCss">
+						<img height="50" width="50" src="resources/img/systemIconHotPoint2.png" />
+					</div>
+				</td>
+				<td>
+					<div id="systemIconHotPoint3_png" class="iconCss">
+						<img height="50" width="50" src="resources/img/systemIconHotPoint3.png" />
+					</div>
+				</td>
+			</tr>
+		</table>
+	</div>
+	<div>
+		<div style="position: absolute; width: 636px; height: 390px;">
+			<img id="hotPoint_BackgroundImg" height="100%" width="100%" />
+		</div>
+		<div id="hotPoint_target" style="position: absolute; width: 636px; height: 390px;"></div>
+	</div>
+	<!-- <div id="hotPoint_target" style="height: 390px;width: 100%;">
+		<img height="388px" width="100%" src="resources/4CD55929FA25A5E8BD5C9D0371EA50CF.jpg" />
+	</div> -->
+</div>

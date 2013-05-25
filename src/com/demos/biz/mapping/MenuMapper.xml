@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.demos.biz.mapper.MenuMapper">
+	<resultMap id="BaseResultMap" type="com.demos.biz.domain.Menu">
+		<id column="menuId" property="menuId" jdbcType="INTEGER" />
+		<result column="epId" property="epId" jdbcType="VARCHAR" />
+		<result column="belongTo" property="belongTo" jdbcType="INTEGER" />
+		<result column="parMenuId" property="parMenuId" jdbcType="INTEGER" />
+		<result column="menuName" property="menuName" jdbcType="VARCHAR" />
+		<result column="menuType" property="menuType" jdbcType="VARCHAR" />
+		<association property="effect" javaType="com.demos.biz.domain.Effect">
+			<result column="eid" property="eid" jdbcType="INTEGER" />
+			<result column="eName" property="eName" jdbcType="VARCHAR" />
+		</association>
+		<collection property="menuPorperty" ofType="com.demos.biz.domain.MenuPorperty">
+			<id column="mpId" property="mpId" jdbcType="INTEGER" />
+			<result column="menuId" property="menuId" jdbcType="INTEGER" />
+			<result column="proKey" property="proKey" jdbcType="VARCHAR" />
+			<result column="proValue" property="proValue" jdbcType="VARCHAR" />
+		</collection>
+	</resultMap>
+
+	<select id="getList" resultMap="BaseResultMap" parameterType="map">
+		SELECT * FROM tbl_menu a, tbl_effect b
+		WHERE a.eid = b.eid
+		AND belongTo = #{currUserId}
+	</select>
+	
+	<select id="getIncludeProList" resultMap="BaseResultMap" parameterType="Integer">
+		SELECT a.menuName, b.* FROM tbl_menu a  
+		LEFT JOIN tbl_menuporperty b 
+		ON a.menuId = b.menuId
+		WHERE (b.proKey LIKE '%MenuPicture' OR b.proKey LIKE '%Place')
+		AND a.parMenuId = #{parMenuId};
+	</select>
+
+	<select id="getTotal" resultType="int">
+		select count(*) from tbl_menu;
+	</select>
+
+	<select id="addMenu" parameterType="com.demos.biz.domain.Menu">
+		INSERT INTO tbl_menu(belongTo, parMenuId, menuName, menuType, eid, epId)
+		VALUES(#{belongTo}, #{parMenuId}, #{menuName}, #{menuType}, #{effect.eid}, #{epId});
+	</select>
+
+	<select id="updateMenu" parameterType="com.demos.biz.domain.Menu">
+		UPDATE tbl_menu 
+		SET parMenuId = #{parMenuId}, menuName = #{menuName}
+			, menuType = #{menuType}, eid = #{effect.eid}
+			, epId = #{epId}
+		WHERE menuId = #{menuId};
+	</select>
+
+	<select id="deleteMenu" parameterType="Integer">
+		DELETE FROM tbl_menu WHERE menuId IN
+		<foreach collection="array" index="index" item="item" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</select>
+
+</mapper>
